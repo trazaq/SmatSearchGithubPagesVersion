@@ -1,0 +1,57 @@
+[package]
+name = "smatdb_search_actixweb"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[profile.release]
+#opt-level = 3
+lto = "fat"
+debug = false
+strip = true
+debug-assertions = false
+
+
+#[workspace.metadata.cross.target.x86_64-unknown-linux-musl]
+#pre-build = [
+#    "apt install make",
+#    "apt install pkg-config",
+#    "apt install --assume-yes make",
+#    "sudo apt-get --assume-yes install perl",
+#    "apt-get update && apt-get --assume-yes install libssl-dev"
+#]
+#env.passthrough = ["CMAKE_TOOLCHAIN_FILE_aarch64_unknown_linux_musl"]
+
+[dependencies]
+actix-web = { version = "4" }
+actix-files = "0.6"
+serde = { version = "~1.0", features = ["derive", "rc"] }
+serde_json = {  version = "~1.0", features = [] }
+
+derive_more = "~0.99"
+htmlescape = { version = "0.3.*" }
+
+dotenvy = "~0.15"
+rusqlite = { version = "0.32.1", features = ["bundled-sqlcipher-vendored-openssl"] }
+time = { version = "~0.3", features = ["parsing", "formatting", "macros"] }
+glob = "~0.3"
+chrono = "~0.4"
+tracing-actix-web = { version = "~0.7" }
+env_logger = "~0.11"
+log = { version = "~0.4" }
+futures = "~0.3"
+tracing = { version = "~0.1", features = ["attributes"] }
+tracing-subscriber = { version = "~0.3", features = ["time", "env-filter", "local-time"] }
+gethostname = { version = "~0.4" }
+actix-cors = "0.7.0"
+async-stream = "0.3.5"
+bytes = "1.6.1"
+tokio = "1.39.3"
+tokio-stream = "0.1.15"
+
+[dev-dependencies]
+reqwest = { version = "~0", features = ["cookies"] }
+once_cell = { version = "~1" }
+anyhow = { version = "~1.0" }
+portpicker = "~0.1"

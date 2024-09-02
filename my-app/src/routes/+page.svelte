@@ -35,7 +35,6 @@
 	<br />
 	<SearchThreads all_threads={data.all_threads} />
 	<br />
-	<!--			<Sites sites={data.sites} />-->
 </div>
 
 <style>

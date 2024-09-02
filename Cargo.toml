@@ -50,19 +50,6 @@ bytes = "1.6.1"
 tokio = "1.39.3"
 tokio-stream = "0.1.15"
 
-# Vercel:
-vercel_runtime = { version = "1" }
-# Each handler has to be specified as [[bin]]
-[[bin]]
-name = "all_threads"
-path = "routes/api/all_threads.rs"
-# Each handler has to be specified as [[bin]]
-[[bin]]
-name = "search_results"
-path = "routes/api/search_results.rs"
-
-
-
 [dev-dependencies]
 reqwest = { version = "~0", features = ["cookies"] }
 once_cell = { version = "~1" }

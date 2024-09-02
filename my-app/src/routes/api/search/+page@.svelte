@@ -1,8 +1,7 @@
 <script lang="ts">
-  //import HL7Dictionary from "hl7-dictionary";
-  import { PUBLIC_HOST, PUBLIC_PORT } from "$env/static/public";
-  //let PUBLIC_PORT = "17600"
-  import { prettyPrintJson } from "pretty-print-json";
+    //import HL7Dictionary from "hl7-dictionary";
+    //let PUBLIC_PORT = "17600"
+    import {prettyPrintJson} from "pretty-print-json";
 
     /** @type {import('./$types').PageData} */
 
@@ -13,7 +12,8 @@
             thread_name: string,
             search: string,
             smat_file: string
-        }
+        },
+        messages: string[]
     };
 
     let site = data.search_params.site ?? "";
@@ -39,96 +39,64 @@
     async function handleSubmit() {
         disabled = true; // disable the submit button to avoid repeated requests by the user...
 
-        const params = new URLSearchParams();
-        params.set("site", site);
-        params.set("process", process);
-        params.set("thread_name", thread_name);
-        params.set("search", search);
-        params.set("date1", date1);
-        params.set("date2", date2)
-        params.set("msg_limit", msg_limit.toString())
-        params.set("smat_file", data.search_params.smat_file);
-        params.set("case_sensitive", String(case_sensitive));
+        try {
+            returned_messages = search_db().messages.map((msg: string, i: number, array) => {
+                // if this is a JSON message, pretty-print it
+                let json = formatJson(msg);
+                if (json) {
+                    return {type: 'json', data: json}
+                } else {
+                    const segs = msg.includes("\n") ? msg.split("\n") : msg.split("\r");
+                    segs.forEach(function (seg, i) {
+                        if (seg) {
+                            const fields = seg.split("|");
+                            if (fields.length > 0) {
+                                //bold the seg names
+                                const segname = fields[0].trim();
+                                let isMSH = segname === "MSH";
+                                fields[0] = "<strong>" + segname + "</strong>";
 
-        // <url>/search?site=verity&process=verity&thread_name=testdb1&date=&search=99999999999999999999
-        await fetch(`http://${PUBLIC_HOST}:${PUBLIC_PORT}/api/search?${params}`)
-            .then((response) => response.json())
-            .then(
-                (data: {
-                    messages: string[];
-                    total_msgs: number;
-                    smatdbs: string[];
-                    positive_smats: string[];
-                    search_limit_reached: boolean;
-                    errors: string[];
-                }) => {
-                    try {
-                        //date = data.date.slice(0, 10)
-                        let messages = data.messages.map((msg: string, i: number, array) => {
-                            // if this is a JSON message, pretty-print it
-                            let json = formatJson(msg);
-                            if (json) {
-                                return {type: 'json', data: json}
-                            } else {
-                                const segs = msg.includes("\n") ? msg.split("\n") : msg.split("\r");
-                                segs.forEach(function (seg, i) {
-                                    if (seg) {
-                                        const fields = seg.split("|");
-                                        if (fields.length > 0) {
-                                            //bold the seg names
-                                            const segname = fields[0].trim();
-                                            let isMSH = segname === "MSH";
-                                            fields[0] = "<strong>" + segname + "</strong>";
+                                //bold the message type
+                                if (isMSH && fields.length >= 8) fields[8] = "<strong>" + fields[8] + "</strong>";
 
-                                            //bold the message type
-                                            if (isMSH && fields.length >= 8) fields[8] = "<strong>" + fields[8] + "</strong>";
-
-                                            for (let i = 0; i < fields.length; ++i) {
-                                                //Only add a span if there is data in the field
-                                                if (fields[i]) {
-                                                    let desc = "";
-                                                    try {
-                                                        const index = isMSH ? i : i - 1;
-                                                        //desc = HL7Dictionary.definitions["2.7"].segments[segname].fields[index].desc;
-                                                    } catch (e) {/* empty */
-                                                    }
-                                                    //console.log(desc)
-                                                    //incr i by 1 if dealing with the MSH segment
-                                                    fields[i] = `<span class="${segname}-${isMSH ? i + 1 : i}" title="${segname}-${isMSH ? i + 1 : i}: ${desc}">${fields[i]}</span>`;
-                                                }
-                                            }
+                                for (let i = 0; i < fields.length; ++i) {
+                                    //Only add a span if there is data in the field
+                                    if (fields[i]) {
+                                        let desc = "";
+                                        try {
+                                            const index = isMSH ? i : i - 1;
+                                            //desc = HL7Dictionary.definitions["2.7"].segments[segname].fields[index].desc;
+                                        } catch (e) {/* empty */
                                         }
-                                        segs[i] = fields.join("|");
+                                        //console.log(desc)
+                                        //incr i by 1 if dealing with the MSH segment
+                                        fields[i] = `<span class="${segname}-${isMSH ? i + 1 : i}" title="${segname}-${isMSH ? i + 1 : i}: ${desc}">${fields[i]}</span>`;
                                     }
-                                });
-                                //array[i] = segs.join("<br>");
-                                return {type: 'hl7', data: segs.join("<br>")}
+                                }
                             }
-                        });
-                        returned_messages = messages;
-                        total_msgs_searched = data.total_msgs;
-                        smat_dbs = data.smatdbs;
-                        positive_smats = data.positive_smats;
-                        search_limit_reached = data.search_limit_reached ?? false;
-                        try {
-                            errors = data.errors;
-                        } catch (e) {
-                            errors = [];
+                            segs[i] = fields.join("|");
                         }
-                    } catch (e) {
-                        console.log(e);
-                        returned_messages.length = 0;
-                        returned_messages.push({type: 'error', data: `${e}`});
-                    }
+                    });
+                    //array[i] = segs.join("<br>");
+                    return {type: 'hl7', data: segs.join("<br>")}
                 }
-            )
-            .catch((e) => {
-                console.log(e);
-                returned_messages.length = 0;
-                returned_messages.push({type: 'error', data: `${e}`});
             });
+            total_msgs_searched = search_db().total_msgs;
+            smat_dbs = search_db().smatdbs;
+            positive_smats = search_db().positive_smats;
+            search_limit_reached = search_db().search_limit_reached ?? false;
+            try {
+                errors = search_db().errors;
+            } catch (e) {
+                errors = [];
+            }
+        } catch (e) {
+            console.log(e);
+            returned_messages.length = 0;
+            returned_messages.push({type: 'error', data: `${e}`});
+        }
+
         disabled = false;
-        //await getStats();
     }
 
     // prettier-ignore
@@ -138,6 +106,24 @@
             return prettyPrintJson.toHtml(json);
         } catch (e) {
             return false
+        }
+    }
+
+    function search_db(): {
+        messages: string[];
+        total_msgs: number;
+        smatdbs: string[];
+        positive_smats: string[];
+        search_limit_reached: boolean;
+        errors: string[];
+    } {
+        return {
+            messages: data.messages,
+            total_msgs: data.messages.length,
+            smatdbs: ['here is the smatdb.smat'],
+            positive_smats: ['here is the smatdb.smat'],
+            search_limit_reached: false,
+            errors: []
         }
     }
 </script>
@@ -203,13 +189,13 @@
         {#if search.length > 0}
             <p>
                 <strong
-                >Found {returned_messages.length - 1} out of: {total_msgs_searched}</strong
+                >Found {returned_messages.length} out of: {total_msgs_searched}</strong
                 >
             </p>
         {:else}
             <p>
                 <strong
-                >Retrieved first {returned_messages.length -1} out of: {total_msgs_searched}</strong
+                >Retrieved first {returned_messages.length} out of: {total_msgs_searched}</strong
                 >
             </p>
         {/if}

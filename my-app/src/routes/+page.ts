@@ -1,10 +1,6 @@
-import { PUBLIC_HOST } from '$env/static/public';
-import { PUBLIC_PORT } from '$env/static/public';
-import { error } from '@sveltejs/kit';
-import type { PageLoad } from './$types';
+import type {PageLoad} from './$types';
 
 export const load: PageLoad = async ({fetch, url, route, params}) => {
-    const sites: string[] = [];
     let all_threads: ({
         site: string,
         process: string,
@@ -17,38 +13,20 @@ export const load: PageLoad = async ({fetch, url, route, params}) => {
         outfile: string,
         link: string,
         site_process_thread_port: string
-    })[] = [];
+    })[];
 
-    await fetch(`http://${PUBLIC_HOST}:${PUBLIC_PORT}/api/all_threads`)
-        .then((response) => response.json())
-        .then((values: {
-            "site": string,
-            "process": string,
-            "thread": string,
-            "ip": string,
-            "port": string,
-            "insave": string,
-            "infile": string,
-            "outsave": string,
-            "outfile": string
-        }[]) => {
-            all_threads = values.map((val) => {
+    all_threads = sample_data().map(val => {
 
-                const link = generateLinke(val);
-                return {
-                    ...val,
-                    link: link,
-                    site_process_thread_port: `${val.site} ${val.process} ${val.thread} ${val.ip} ${val.port}`.toLowerCase()
-                }
+        const link = generateLinke(val);
+        return {
+            ...val,
+            link: link,
+            site_process_thread_port: `${val.site} ${val.process} ${val.thread} ${val.ip} ${val.port}`.toLowerCase()
+        }
 
-            })
-        })
-        .catch((e) => {
-            console.log(e);
-            return error(500, '');
-        });
+    })
 
-    return {sites: sites, all_threads: all_threads};
+    return {all_threads: all_threads};
 };
 
 function generateLinke(val: {
@@ -88,4 +66,52 @@ function generateLinke(val: {
     }
 
     return link;
+}
+
+
+function sample_data(): {
+    site: string,
+    process: string,
+    thread: string,
+    ip: string,
+    port: string,
+    insave: string,
+    infile: string,
+    outsave: string,
+    outfile: string,
+}[] {
+    return [
+        {
+            "site": "verity",
+            "process": "verity",
+            "thread": "testdb1",
+            "ip": "localhost",
+            "port": "8080",
+            "insave": "1",
+            "infile": "testdb1",
+            "outsave": "0",
+            "outfile": ""
+        },
+        {
+            "site": "verity",
+            "process": "verity",
+            "thread": "no_smat_configured",
+            "ip": "",
+            "port": "",
+            "insave": "0",
+            "infile": "",
+            "outsave": "0",
+            "outfile": ""
+        },
+        {
+            "site": "verity",
+            "process": "verity",
+            "thread": "both_smat_configured",
+            "ip": "",
+            "port": "",
+            "insave": "1",
+            "infile": "testdb1",
+            "outsave": "1",
+            "outfile": "testdb1"
+        }];
 }

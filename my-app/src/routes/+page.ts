@@ -46,23 +46,23 @@ function generateLinke(val: {
 
     // redirect to select_smat
     if (val.insave == "1" && val.outsave == "1") {
-        link = `/api/select_smat?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&infile=${val.infile}&outfile=${val.outfile}&date=${date}`;
+        link = `/SmatSearchGithubPagesVersion.github.io/api/select_smat?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&infile=${val.infile}&outfile=${val.outfile}&date=${date}`;
     }
 
     if (val.insave == "1" && val.outsave == "0") {
-        link = `/api/search?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=${val.infile}&date=${date}`;
+        link = `/SmatSearchGithubPagesVersion.github.io/api/search?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=${val.infile}&date=${date}`;
     }
 
     if (val.insave == "0" && val.outsave == "1") {
-        link = `/api/search?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=${val.outfile}&date=${date}`;
+        link = `/SmatSearchGithubPagesVersion.github.io/api/search?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=${val.outfile}&date=${date}`;
     }
 
     if (val.insave == "0" && val.outsave == "0") {
-        link = `/api/error?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=&date=${date}`;
+        link = `/SmatSearchGithubPagesVersion.github.io/api/error?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=&date=${date}`;
     }
 
     if (val.insave == "" && val.outsave == "") {
-        link = `/api/error?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=&date=${date}`;
+        link = `/SmatSearchGithubPagesVersion.github.io/api/error?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=&date=${date}`;
     }
 
     return link;

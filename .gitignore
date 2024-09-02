@@ -6,7 +6,7 @@ target/
 .idea/
 
 # Static folder
-static/root/
+#static/root/
 
 **tests
 !tests/server.ini

@@ -55,11 +55,11 @@ vercel_runtime = { version = "1" }
 # Each handler has to be specified as [[bin]]
 [[bin]]
 name = "all_threads"
-path = "api/all_threads.rs"
+path = "src/routes/api/all_threads.rs"
 # Each handler has to be specified as [[bin]]
 [[bin]]
 name = "search_results"
-path = "api/search_results.rs"
+path = "src/routes/api/search_results.rs"
 
 
 

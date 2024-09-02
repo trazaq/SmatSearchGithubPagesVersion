@@ -1,4 +1,5 @@
 import type {PageLoad} from './$types';
+import {PUBLIC_HOST} from "$env/static/public";
 
 export const load: PageLoad = async ({fetch, url, route, params}) => {
     let all_threads: ({
@@ -46,23 +47,23 @@ function generateLinke(val: {
 
     // redirect to select_smat
     if (val.insave == "1" && val.outsave == "1") {
-        link = `/SmatSearchGithubPagesVersion.github.io/api/select_smat?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&infile=${val.infile}&outfile=${val.outfile}&date=${date}`;
+        link = `/${PUBLIC_HOST}/api/select_smat?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&infile=${val.infile}&outfile=${val.outfile}&date=${date}`;
     }
 
     if (val.insave == "1" && val.outsave == "0") {
-        link = `/SmatSearchGithubPagesVersion.github.io/api/search?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=${val.infile}&date=${date}`;
+        link = `/${PUBLIC_HOST}/api/search?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=${val.infile}&date=${date}`;
     }
 
     if (val.insave == "0" && val.outsave == "1") {
-        link = `/SmatSearchGithubPagesVersion.github.io/api/search?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=${val.outfile}&date=${date}`;
+        link = `/${PUBLIC_HOST}/api/search?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=${val.outfile}&date=${date}`;
     }
 
     if (val.insave == "0" && val.outsave == "0") {
-        link = `/SmatSearchGithubPagesVersion.github.io/api/error?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=&date=${date}`;
+        link = `/${PUBLIC_HOST}/api/error?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=&date=${date}`;
     }
 
     if (val.insave == "" && val.outsave == "") {
-        link = `/SmatSearchGithubPagesVersion.github.io/api/error?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=&date=${date}`;
+        link = `/${PUBLIC_HOST}/api/error?site=${val.site}&process=${val.process}&thread_name=${val.thread}&search=99999999999999999999&smat_file=&date=${date}`;
     }
 
     return link;
